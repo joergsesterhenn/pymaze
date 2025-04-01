@@ -8,9 +8,16 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 labyrinth-py = "^1.0.4"
-pygame = "^2.6.1"
+panda3d = "^1.10.15"
 
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.2"
+pytest = "^8.3.5"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+pymaze = 'pymaze.pymaze:start'
