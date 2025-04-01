@@ -1,9 +1,10 @@
 from direct.showbase.ShowBase import ShowBase
-from panda3d.core import LVector3, CardMaker, ClockObject, loadPrcFileData
-
-loadPrcFileData("", "audio-library-name null")  # no audio
-loadPrcFileData("", "load-display tinydisplay")  # software rendering
-loadPrcFileData("", "input-device-configuration false")
+from panda3d.core import LVector3f, CardMaker, ClockObject, Point3, Mat3, Vec3
+#, loadPrcFileData
+#loadPrcFileData("", "audio-library-name null")  # no audio
+#loadPrcFileData("", "load-display tinydisplay")  # software rendering
+#loadPrcFileData("", "input-device-configuration false")
+#loadPrcFileData("", "load-display pandadx11")  # For DirectX 11
 
 
 # Get global clock for frame time updates
@@ -54,6 +55,13 @@ class MazeGame(ShowBase):
         # Update movement every frame
         self.taskMgr.add(self.update_movement, "update_movement")
 
+        # Example camera position
+        self.camera.setPos(Point3(0, -20, 10))
+        self.camera.lookAt(0, 0, 0)
+
+        # To keep the window open and start the app's main loop
+        self.run()
+
     def set_movement(self, key, value):
         self.movement[key] = value
 
@@ -63,7 +71,13 @@ class MazeGame(ShowBase):
         # Get current position and direction
         pos = self.camera.get_pos()
         h = self.camera.get_h()
-        direction = LVector3(0, 1, 0).rotated_around(LVector3.up(), h)
+
+        # Create a rotation matrix
+        rotation_matrix = Mat3.rotate_mat(h, Vec3(0, 0, 1))  # Rotate around the Z-axis
+
+        # Apply the rotation to the vector
+        direction: LVector3f = LVector3f(0, 1, 0)
+        direction = rotation_matrix.xform(direction)
 
         # Apply movement
         if self.movement["forward"]:
@@ -71,9 +85,9 @@ class MazeGame(ShowBase):
         if self.movement["backward"]:
             pos -= direction * self.speed * dt
         if self.movement["left"]:
-            pos -= direction.cross(LVector3.up()) * self.speed * dt
+            pos -= direction.cross(LVector3f.up()) * self.speed * dt
         if self.movement["right"]:
-            pos += direction.cross(LVector3.up()) * self.speed * dt
+            pos += direction.cross(LVector3f.up()) * self.speed * dt
         if self.movement["turn_left"]:
             self.camera.set_h(h + self.turn_speed * dt)
         if self.movement["turn_right"]:
